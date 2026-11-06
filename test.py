@@ -1,0 +1,1 @@
+print(type(1.0) in (bool,))

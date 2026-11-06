@@ -1,0 +1,2 @@
+BASE_URL = "https://plusvibeapi.ru/v1"
+MODEL = "gpt-5.6-luna"
