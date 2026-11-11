@@ -9,6 +9,8 @@ from openai import OpenAI
 BASE_URL = "https://plusvibeapi.ru/v1"
 # MODEL = "gpt-5.6-luna:purple"
 MODEL = "gpt-5.6-luna"
+TEMPERATURE = 0.2
+MAX_OUTPUT_TOKENS = 80
 
 SYSTEM_INSTRUCTION = (
     "Ты помогаешь оператору службы поддержки. "
@@ -49,22 +51,11 @@ def summarize_request(client: OpenAI, user_text: str) -> None:
     started_at = perf_counter()
 
     try:
-        # response = client.chat.completions.create(
-        #     model=MODEL,
-        #     messages=[
-        #         {
-        #             "role": "user",
-        #             "content": (
-        #                 "Сформулируй краткое содержание обращения в одном "
-        #                 "предложении. Не добавляй факты, которых нет в тексте.\n\n"
-        #                 f"Обращение: {text}"
-        #             ),
-        #         }
-        #     ],
-        # )
         response = client.chat.completions.create(
             model=MODEL,
             messages=build_messages(text),
+            temperature=TEMPERATURE,
+            max_completion_tokens=MAX_OUTPUT_TOKENS,
         )
 
     except openai.AuthenticationError:
