@@ -7,7 +7,16 @@ from openai import OpenAI
 
 
 BASE_URL = "https://plusvibeapi.ru/v1"
+# MODEL = "gpt-5.6-luna:purple"
 MODEL = "gpt-5.6-luna"
+
+SYSTEM_INSTRUCTION = (
+    "Ты помогаешь оператору службы поддержки. "
+    "Кратко пересказывай обращение одним предложением. "
+    "Используй только факты из обращения. "
+    "Не придумывай суммы, даты, причины и действия. "
+    "Если данных недостаточно, прямо сообщай об этом."
+)
 
 def print_usage(usage) -> None:
     if usage is None:
@@ -16,6 +25,19 @@ def print_usage(usage) -> None:
     print(f"Входные токены: {usage.prompt_tokens}")
     print(f"Выходные токены: {usage.completion_tokens}")
     print(f"Всего токенов: {usage.total_tokens}")
+
+
+def build_messages(user_text: str) -> list[dict[str, str]]:
+    return [
+        {
+            "role": "system",
+            "content": SYSTEM_INSTRUCTION,
+        },
+        {
+            "role": "user",
+            "content": f"Обращение:\n{user_text}",
+        },
+    ]
 
 
 def summarize_request(client: OpenAI, user_text: str) -> None:
@@ -27,19 +49,24 @@ def summarize_request(client: OpenAI, user_text: str) -> None:
     started_at = perf_counter()
 
     try:
+        # response = client.chat.completions.create(
+        #     model=MODEL,
+        #     messages=[
+        #         {
+        #             "role": "user",
+        #             "content": (
+        #                 "Сформулируй краткое содержание обращения в одном "
+        #                 "предложении. Не добавляй факты, которых нет в тексте.\n\n"
+        #                 f"Обращение: {text}"
+        #             ),
+        #         }
+        #     ],
+        # )
         response = client.chat.completions.create(
             model=MODEL,
-            messages=[
-                {
-                    "role": "user",
-                    "content": (
-                        "Сформулируй краткое содержание обращения в одном "
-                        "предложении. Не добавляй факты, которых нет в тексте.\n\n"
-                        f"Обращение: {text}"
-                    ),
-                }
-            ],
+            messages=build_messages(text),
         )
+
     except openai.AuthenticationError:
         print("Ошибка авторизации: проверьте LLM_API_KEY.")
         return
@@ -88,8 +115,8 @@ def summarize_request(client: OpenAI, user_text: str) -> None:
 
 def main() -> None:
     load_dotenv()
-
     token = os.getenv("LLM_API_KEY")
+
     if not token:
         raise SystemExit(
             "Не найдена переменная LLM_API_KEY. "
