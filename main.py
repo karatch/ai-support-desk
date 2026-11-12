@@ -7,7 +7,7 @@ from openai import OpenAI
 
 
 BASE_URL = "https://plusvibeapi.ru/v1"
-# MODEL = "gpt-5.6-luna:purple"
+# MODEL = "claude-haiku-5.5"
 MODEL = "gpt-5.6-luna"
 TEMPERATURE = 0.2
 MAX_OUTPUT_TOKENS = 80
@@ -84,6 +84,21 @@ def summarize_request(client: OpenAI, user_text: str) -> None:
 
     elapsed_seconds = perf_counter() - started_at
     choice = response.choices[0]
+
+    if choice.finish_reason == "length":
+        print(
+            "Ответ модели остановлен из-за ограничения длины. "
+            "Увеличьте MAX_OUTPUT_TOKENS или сократите задачу."
+        )
+        return
+
+    if choice.finish_reason != "stop":
+        print(
+            "Модель не вернула готовое резюме. "
+            f"Причина завершения: {choice.finish_reason}."
+        )
+        return
+
     answer = choice.message.content
 
     print("\nРезультат:")
