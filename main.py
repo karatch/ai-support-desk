@@ -42,6 +42,19 @@ def build_messages(user_text: str) -> list[dict[str, str]]:
     ]
 
 
+def validate_summary(summary: str | None) -> str:
+    if summary is None:
+        raise ValueError("Модель не вернула текст")
+
+    cleaned = summary.strip()
+    if not cleaned:
+        raise ValueError("Модель вернула пустой ответ")
+    if len(cleaned) > 300:
+        raise ValueError("Резюме получилось слишком длинным")
+
+    return cleaned
+
+
 def summarize_request(client: OpenAI, user_text: str) -> None:
     text = user_text.strip()
     if not text:
@@ -99,20 +112,21 @@ def summarize_request(client: OpenAI, user_text: str) -> None:
         )
         return
 
-    answer = choice.message.content
+    try:
+        answer = validate_summary(choice.message.content)
+    except ValueError as error:
+        print(f"Некорректный ответ модели: {error}")
+        return
 
     print("\nРезультат:")
-    print(answer or "Модель не вернула текстовый ответ")
+    # print(answer or "Модель не вернула текстовый ответ")
+    print(answer)
 
     print("\nМетрики:")
     print(f"Модель: {response.model}")
     print(f"Завершение: {choice.finish_reason}")
     print(f"Время: {elapsed_seconds:.2f} с")
 
-    # if response.usage is not None:
-    #     print(f"Входные токены: {response.usage.prompt_tokens}")
-    #     print(f"Выходные токены: {response.usage.completion_tokens}")
-    #     print(f"Всего токенов: {response.usage.total_tokens}")
 
     print_usage(response.usage)
 
