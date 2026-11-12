@@ -144,7 +144,7 @@ def main() -> None:
         )
 
     client = OpenAI(base_url=BASE_URL, api_key=token)
-    user_text = input("Введите текст обращения: ")
+    user_text = input("Введите текст обращения: ").strip()
     summarize_request(client, user_text)
 
 

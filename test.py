@@ -1,1 +1,3 @@
-print(type(1.0) in (bool,))
+s = "    "
+
+print(not s.strip())
