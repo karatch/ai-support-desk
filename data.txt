@@ -1,2 +1,4 @@
 BASE_URL = "https://plusvibeapi.ru/v1"
 MODEL = "gpt-5.6-luna"
+
+python -c "from config import Settings; s = Settings(); print(s.app_env, s.model, s.temperature, s.max_output_tokens); print(s.llm_api_key)"
