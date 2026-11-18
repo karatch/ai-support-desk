@@ -29,9 +29,14 @@ class Settings(BaseSettings):
         validation_alias="MAX_OUTPUT_TOKENS",
     )
     request_timeout_seconds: float = Field(
-        default=30.0,
+        default=0.1,
         gt=0.0,
         validation_alias="REQUEST_TIMEOUT_SECONDS",
+    )
+    max_retries: int = Field(
+        default=2,
+        le=5,
+        validation_alias="MAX_RETRIES",
     )
     app_env: Literal["development", "test", "production"] = Field(
         default="development",
