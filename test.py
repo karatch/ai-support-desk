@@ -1,34 +1,39 @@
-from typing import Mapping
-
-
-def parse_positive_int(
-    env: Mapping[str, object],
-    name: str,
-    default: int,
-) -> int:
-    if isinstance(default, bool) or not isinstance(default, int):
-        raise TypeError
-    if default <= 0:
+def build_instruction(
+        goal: str,
+        rules: list[str],
+        output_format: str,
+) -> str:
+    try:
+        goal = goal.strip()
+        output_format = output_format.strip()
+    except:
+        raise TypeError from None
+    if not goal or not output_format:
         raise ValueError
 
-    result = env.get(name)
-    if result is None or result == "":
-        return default
+    if not isinstance(rules, list):
+        raise TypeError
 
-    if isinstance(result, bool):
+    if not rules:
         raise ValueError
 
     try:
-        result = int(result)
+        cleaned_rules = ["- " + s.strip() for s in rules if s.strip()]
     except:
-        raise ValueError("Ожидалось целое число")
+        raise TypeError from None
 
-    if result <= 0:
+    if len(cleaned_rules) < len(rules):
         raise ValueError
 
-    return result
+    goal = f"Цель:\n{goal}"
+    cleaned_rules = f"\nПравила:\n{"\n".join(cleaned_rules)}"
+    output_format = f"\nФормат ответа:\n{output_format}"
 
-print(parse_positive_int({"MAX_OUTPUT_TOKENS": "10a"},
-                   "MAX_OUTPUT_TOKENS", 80))
+    return f"{goal}\n{cleaned_rules}\n{output_format}"
 
-print(int(True))
+
+print(build_instruction(
+    "Кратко перескажи обращение.",
+    ["Не добавляй факты.", "Не давай советов.", "   "],
+    "Одно предложение.",
+))
