@@ -37,3 +37,7 @@ def get_support_summary_prompt(
             f"{selected_version}. "
             f"Доступны: {available}."
         ) from error
+
+
+def list_support_summary_versions() -> tuple[str, ...]:
+    return tuple(_SUPPORT_SUMMARY_PROMPTS)
