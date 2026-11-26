@@ -28,6 +28,11 @@ class Settings(BaseSettings):
         gt=0,
         validation_alias="MAX_OUTPUT_TOKENS",
     )
+    chat_input_token_budget: int = Field(
+        default=6000,
+        gt=0,
+        validation_alias="CHAT_INPUT_TOKEN_BUDGET",
+    )
     request_timeout_seconds: float = Field(
         default=0.1,
         gt=0.0,
